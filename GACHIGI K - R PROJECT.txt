@@ -1,0 +1,206 @@
+# AUTHOR : KENNEDY GACHIGI
+# R Project July 2019
+# GROUP 9
+# OTHER MEMBERS AND CONTRIBUTION; MICHAEL YAN : 100% . SYAMSUDIN SLAMET : 100%.
+
+# CONVERGENCE IN PROBABILITY.
+
+#part 1. Convergence in probabiity
+
+set.seed(1)
+#Problem 1.D :   generate random vales from laplace distributing using proposition D
+##########  inverse CDF of laplace distributin:
+##########  b*log(2*u) + mu #inverse laplace CDF with supports y < mu
+##########  mu - b*log(2-2*u) #inverse laplace CDF with supports y > mu
+
+#create parameters of laplace distribution (mu,b)
+mu <- 0
+b <- 5
+
+#create # data set
+N <- 50
+
+#create # of sample size
+n <- 250
+length(n)
+
+#create dummy vectors to store
+L <- K  <- matrix(,nrow = N, ncol = n)
+
+#create data set of size i from a uniform distribution
+ 
+#loop over sample size
+for (j in 1:n) {
+  #loop through data sets
+  for (i in 1:N) {
+  u <- runif(n=j, min=0, max = 1)
+  datavalues <- ifelse(u<0.5,mu + b*log(2*u), mu - b*log(2*(1-u))) #inverse laplace CDF
+  L[i,j] <- mean(datavalues^2)
+  K[i,j] <- sqrt(mean(datavalues^2))
+}
+}
+
+#the process of loops above start with sample size 1 stated in the first loop over sample size
+#within each sample size, the loop is working from data set 1 to 50.
+
+var(L[,1])
+
+#Problem 1E: plot the values L and K to see what values they are converging to!
+
+#Recall:
+####### Y ~ Laplace (mu, b)
+###### L = (sigma 1 to 50 Y_i^2) - Plot, theoretically converges to 50
+
+par(mfrow=c(1,2))
+plot (x=1:n, y=apply(X=L, MARGIN=2, FUN = mean), ylim=c(20,80),main= "Convergence in Probability of L",
+      xlab= "Number of Sample Size",   ylab= "Mean of Random values squared ")
+abline(h= c(30,50,70), lty=c(2,1,2), lwd=c(2,1,2))
+
+
+#As sample size grows larger ,
+#laplace distribution converge in probability to theoretical mean of squared Random values(50)
+#So,  the Law of Large numbers holds in this case.
+
+#K = sqrt(sigma 1 to 50 Y_i^2) - Plot, theoretically converges to 50
+#i. plot value with n sample size on the x-axis and L(or K) values in Y-axis
+plot (x=1:n, y=apply(X=K, MARGIN=2, FUN = mean), ylim=c(4,11),main= "Convergence in Probability of K",
+      xlab= "Number of Sample Size",   ylab= "value of squared root of L")
+abline(h= c(4.071,7.071,10.071), lty=c(2,1,2), lwd=c(2,1,2))
+
+#K qauntities converges in probability to square root of expected value of L quantities,
+#the result from the graph was quite similar to the theoretical results, so
+#Continuity theorem holds.
+
+######Part 2
+
+#Problem 2. Take the N values of L and K for each n =10,50,100,250 and 
+#create histrogram to inspect shape of dist.
+size = c(10,50,100,250)
+#create histogram of L
+
+par(mfrow=c(1,4))
+hist(L[,10], breaks=seq(0,200, by = 10),main =paste("Hist of L, n=",size[1], sep="" ), xlab="L Values", ylab= "Dist. of L")
+abline(v= 50, col="red",lty=2,lwd=2) #add central tendency, mean
+hist(L[,50], breaks=seq(0,200, by = 10),main =paste("Hist of L, n=",size[2], sep="" ), xlab="L Values", ylab= "Dist. of L")
+abline(v= 50, col="red",lty=2,lwd=2) #add central tendency, mean
+hist(L[,100], breaks=seq(0,200, by = 10), main =paste("Hist of L, n=",size[3], sep="" ), xlab="L Values", ylab= "Dist. of L")
+abline(v= 50, col="red",lty=2,lwd=2) #add central tendency, mean
+hist(L[,250], breaks=seq(0,200, by = 10), main =paste("Hist of L, n=",size[4], sep="" ), xlab="L Values", ylab= "Dist. of L")
+abline(v= 50, col="red",lty=2,lwd=2) #add central tendency, mean
+
+#create histogram of K
+
+par(mfrow=c(1,4))
+hist(K[,10], breaks=seq(0,15, by = 1),main =paste("Hist of K, n=",size[1], sep="" ), xlab="K Values", ylab= "Dist. of K")
+abline(v= 7.071, col="red",lty=2,lwd=2) #add central tendency, mean
+hist(K[,50], breaks=seq(0,15, by = 1),main =paste("Hist of K, n=",size[2], sep="" ), xlab="K Values", ylab= "Dist. of K")
+abline(v= 7.071, col="red",lty=2,lwd=2) #add central tendency, mean
+hist(K[,100], breaks=seq(0,15, by = 1), main =paste("Hist of K, n=",size[3], sep="" ), xlab="K Values", ylab= "Dist. of K")
+abline(v= 7.071, col="red",lty=2,lwd=2) #add central tendency, mean
+hist(K[,250], breaks=seq(0,15, by = 1), main =paste("Hist of K, n=",size[4], sep="" ), xlab="K Values", ylab= "Dist. of K")
+abline(v= 7.071, col="red",lty=2,lwd=2) #add central tendency, mean
+
+#from the histogram L and K, we can see that the distributions are more symmetric around the mean
+#as sample size gets larger, L and K are converging to a normal distribution
+
+
+#Problem 4 : redo histogram plot using standardization 
+mu <- 50
+sigma <- sqrt(12500)
+
+size = c(10,50,100,250)
+N <- 50
+
+#list to save data values
+datav <- list()
+for (i in 1:length(size)) {
+  datav[[i]] <- matrix(,nrow =N, ncol = size[i])
+}
+
+
+#create the data
+#loop over sample size
+for (j in 1:length(size)) {
+  #loop over sample size
+  for (i in 1:N) {
+  datav[[j]] [i,] <- rnorm(n=size[j], mean = mu, sd=sigma) 
+  }
+}
+
+
+#calculate the z statistics of each samples    
+means10 <- apply(X=datav[[1]], MARGIN=1, FUN=function(datav){(mean(datav)-mu)/(sigma/sqrt(size[1]))})
+means50 <- apply(X=datav[[2]], MARGIN=1, FUN=function(datav){(mean(datav)-mu)/(sigma/sqrt(size[2]))})
+means100 <- apply(X=datav[[3]], MARGIN=1, FUN=function(datav){(mean(datav)-mu)/(sigma/sqrt(size[3]))})
+means250 <- apply(X=datav[[4]], MARGIN=1, FUN=function(datav){(mean(datav)-mu)/(sigma/sqrt(size[4]))})
+
+#create histogram
+par(mfrow=c(2,3))
+
+hist(means10, breaks=seq(-4,4, by = 0.5),main =paste("Hist of z's with, n=",size[1]," from N(",mu,",",sigma^2,")", sep="" ),prob=T)
+lines(seq(from=-3,to=3,by=0.01), dnorm(seq(from=-3,to=3,by=0.01)))
+
+hist(means50, breaks=seq(-4,4, by = 0.5),main =paste("Hist of z's with, n=",size[2]," from N(",mu,",",sigma^2,")", sep="" ),prob=T)
+lines(seq(from=-3,to=3,by=0.01), dnorm(seq(from=-3,to=3,by=0.01)))
+
+hist(means100, breaks=seq(-4,4, by = 0.5),main =paste("Hist of z's with, n=",size[3]," from N(",mu,",",sigma^2,")", sep="" ),prob=T)
+lines(seq(from=-3,to=3,by=0.01), dnorm(seq(from=-3,to=3,by=0.01)))
+
+hist(means250, breaks=seq(-4,4, by = 0.5),main =paste("Hist of z's with, n=",size[4]," from N(",mu,",",sigma^2,")", sep="" ),prob=T)
+lines(seq(from=-3,to=3,by=0.01), dnorm(seq(from=-3,to=3,by=0.01)))
+
+#Problem 5 Evaluate converging for larger values n=c(1000,1000) with 10000 data sets
+
+mu <- 50
+sigma <- sqrt(12500)
+
+size4 = c(1000,10000)
+N4 <- 10000
+
+#list to save data values
+datav4 <- list()
+for (i in 1:length(size4)) {
+  datav4[[i]] <- matrix(,nrow =N4, ncol = size4[i])
+}
+
+
+#create the data
+#loop over sample size
+#create the data
+#loop over sample size
+for (j in 1:length(size4)) {
+  #loop over sample size
+  for (i in 1:N4) {
+    datav4[[j]] [i,] <- rnorm(n=size[j], mean = mu, sd=sigma) 
+  }
+}
+
+#calculate the z statistics of each samples    
+means1000 <- apply(X=datav4[[1]], MARGIN=1, FUN=function(datav4){(mean(datav4)-mu)/(sigma/sqrt(size4[1]))})
+means10000 <- apply(X=datav4[[2]], MARGIN=1, FUN=function(datav4){(mean(datav4)-mu)/(sigma/sqrt(size4[2]))})
+                    
+
+#problem 6 Create histogram plot for problem 5
+#create histogram
+
+hist(means1000,main =paste("Hist of z's with, n=",size4[1]," from N(",mu,",",sigma^2,")", sep="" ),prob=T)
+lines(seq(from=-40,to=40,by=0.1), dnorm(seq(from=-40,to=40,by=0.1)))
+
+hist(means10000,main =paste("Hist of z's with, n=",size4[2]," from N(",mu,",",sigma^2,")", sep="" ),prob=T)
+lines(seq(from=-40,to=40,by=0.1), dnorm(seq(from=-40,to=40,by=0.1)))
+
+
+#CLT stated that as sample size grows, the quantities will converges to true values. However,
+#if the distribution of random values is fairly symmetric and has tails that die off rapidly,
+#the approximation becomes good for relatively small sample sizes, but if the distribution is
+#skewed, a larger value of n is needed. In this case, the lowest sample size of 10 has a fairly
+#symmetric distribution around the mean, so, n >= 10 works (and so does n >= 30) good enough for approximation of true value.
+
+#The two largest data sets of n=1000 and 10000 had means ranging from -60 to 60, but the 
+#density was centered around the true mean. A larger sample size is not necessary here since
+#we can obtain a smaller sample with a relatively symmetric distribution centered around the true mean.
+                    
+
+
+ 
+
